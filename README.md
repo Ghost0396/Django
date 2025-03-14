@@ -1,7 +1,7 @@
 ### Step 1: Clone the repository
 
 ```bash
-git clone https://github.com/Ghost0396/django_example.git
+git clone https://github.com/Ghost0396/Django.git
 ```
 
 ### Step 2: Navigate to the cloned directory
