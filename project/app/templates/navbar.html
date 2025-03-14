@@ -1,0 +1,41 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <!-- https://icons8.com/icons/ -->
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAQ0lEQVR4nO3UQQoAIAwDwf3/p+NdkKI0FqVzrws5CN9QMsoCJC1BB1Z6olBPFKr/KrLgenjmD+zQydG1gNzTyB3gVQPo3EzedEnkbgAAAABJRU5ErkJggg==" alt="web-laptop">
+      </a> 
+      <a class="navbar-brand" href="{% url 'home' %}">APP-NAME</a>
+      
+      <!-- Navbar toggler for smaller screens -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+              data-bs-target="#navbarSupportedContent" 
+              aria-controls="navbarSupportedContent" 
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          
+          <!-- Check if user is authenticated -->
+          {% if user.is_authenticated %}
+            {% if user.is_staff %}
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+            {% endif %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'add_record' %}">Add record</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'home' %}">Login</a>
+            </li>        
+          {% endif %}
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
