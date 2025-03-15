@@ -4,6 +4,12 @@ from django.contrib import messages
 from .forms import SignUpForm, AddRecordForm
 from .models import Record
 from django.core.paginator import Paginator
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+import pandas as pd
+from django.http import HttpResponse
+from django.utils.timezone import make_naive
+import datetime
 
 
 def authenticate_user(username, password):
@@ -35,13 +41,19 @@ def home(request):
     login submissions.
     """
     key = '-created_at'
+    users = User.objects.filter(is_staff=False)
 
     if request.user.is_authenticated:
-        records_list = Record.objects.filter(user=request.user).order_by(key)
-        paginator = Paginator(records_list, 10)  # Show 10 records per page
-
-        page_number = request.GET.get('page')
-        records = paginator.get_page(page_number)
+        if request.user.is_staff:
+            records = {}
+            for user in users:
+                record = Record.objects.filter(user=user).order_by(key).first()
+                records[user] = record.created_at if record else ''
+        else:
+            records_l = Record.objects.filter(user=request.user).order_by(key)
+            paginator = Paginator(records_l, 10)  # Show 10 records per page
+            page_number = request.GET.get('page')
+            records = paginator.get_page(page_number)
     else:
         records = []
 
@@ -78,10 +90,9 @@ def register_user(request):
             # Authenticate and login
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
-            user = authenticate(username=username, password=password)
-            login(request, user)
+            authenticate(username=username, password=password)
             messages.success(request,
-                             f"You have Successfully registered {username}!")
+                             f"You have successfully registered {username}!")
             return redirect('home')
     else:
         form = SignUpForm()
@@ -151,3 +162,48 @@ def update_record(request, id):
     else:
         messages.success(request, "You Must Be Logged In...")
         return redirect('home')
+
+
+@login_required
+def user_records(request, id):
+    """
+    View to show all records from a specific user.
+    """
+    user = get_object_or_404(User, id=id)
+    records = Record.objects.filter(user=user).order_by('-created_at')
+    paginator = Paginator(records, 10)
+    page_number = request.GET.get('page')
+    records = paginator.get_page(page_number)
+    return render(request, 'user_records.html', {'user_name': user,
+                                                 'records': records})
+
+
+def report(request):
+    """
+    Generate an Excel report with all the information from the database.
+    """
+    # Fetch all records from the database
+    records = Record.objects.all().values()
+
+    # Convert the records to a list of dictionaries
+    records_list = list(records)
+
+    # Convert datetime fields to naive datetimes
+    for record in records_list:
+        for key, value in record.items():
+            if isinstance(value, datetime.datetime):
+                record[key] = make_naive(value)
+
+    # Convert the records to a DataFrame
+    df = pd.DataFrame(records_list)
+
+    # Create an Excel file in memory
+    type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    response = HttpResponse(content_type=type)
+    response['Content-Disposition'] = 'attachment; filename=report.xlsx'
+
+    # Use pandas to write the DataFrame to the Excel file
+    with pd.ExcelWriter(response, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Records')
+
+    return response

@@ -41,7 +41,7 @@
                     </tbody>
                 </table>
             </div>
-            <nav aria-label="Page navigation example">
+            <nav aria-label="Page navigation">
               <ul class="pagination">
                 {% for num in records.paginator.page_range %}
                   {% if records.number == num %}
@@ -62,7 +62,23 @@
         {% elif user.is_authenticated and user.is_staff %}
             <h1>Welcome, {{ user.first_name|default:user.username }}!</h1>
             <br>
-            <!-- Add any additional content for staff members here -->
+            <div class="container">
+              <br>
+                <div class="row row-cols-1 row-cols-md-6 g-4">
+                    {% for user, date in records.items %}
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <a href="{% url 'user_records' user.id %}">
+                                      <h5 class="card-title">{{ user }}</h5>
+                                    </a>
+                                    <p class="card-text">Last record: {{ date|default:"N/A" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         {% else %}
             <div class="col-md-6 offset-md-3">
                 <h1>Login</h1>
