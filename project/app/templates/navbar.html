@@ -21,8 +21,15 @@
           <!-- Check if user is authenticated -->
           {% if user.is_authenticated %}
             {% if user.is_staff %}
-                <a class="nav-link" href="{% url 'register' %}">Register</a>
-                <a class="nav-link" href="{% url 'report' %}">Report</a>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'register' %}">Register</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'report' %}">Report</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'configure_excel' %}">Configuration</a>
+            </li>
             {% else %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'add_record' %}">Add record</a>

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <br>
+    <h2>Configure Excel File</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="fileName">File Name:</label>
+        <input type="text" class="form-control" value="{{ name }}" id="fileName" name="fileName" required>
+      </div>
+      <div class="form-group">
+        <label for="recordType">Record Type:</label>
+        <select class="form-control" id="recordType" name="recordType" required>
+          <option value="all">All Users</option>
+          {% for user in users %}
+            <option value="{{ user.username }}">{{ user.username }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="text" class="form-control" value="email@gmail.com" id="email" name="email" required>
+      </div>
+      <br>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

@@ -11,4 +11,5 @@ urlpatterns = [
     path('update_record/<int:id>', views.update_record, name='update_record'),
     path('user_records/<int:id>/', views.user_records, name='user_records'),
     path('report/', views.report, name='report'),
+    path('configure_excel/', views.configure_excel, name='configure_excel'),
 ]

@@ -2,14 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm, AddRecordForm
-from .models import Record
+from .models import Record, Configuration
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import pandas as pd
 from django.http import HttpResponse
 from django.utils.timezone import make_naive
-import datetime
+from datetime import datetime
 
 
 def authenticate_user(username, password):
@@ -87,7 +87,6 @@ def register_user(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            # Authenticate and login
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
             authenticate(username=username, password=password)
@@ -140,10 +139,10 @@ def delete_record(request, id):
     if request.user.is_authenticated and request.user.is_staff:
         delete_it = get_object_or_404(Record, id=id)
         delete_it.delete()
-        messages.success(request, "Record Deleted Successfully!")
+        messages.success(request, "Record deleted successfully!")
         return redirect('home')
     else:
-        messages.success(request, "You Must Be Staff To Delete A Record!")
+        messages.success(request, "You must be staff to delete a record!")
         return redirect('home')
 
 
@@ -156,11 +155,11 @@ def update_record(request, id):
         form = AddRecordForm(request.POST or None, instance=current_record)
         if form.is_valid():
             form.save()
-            messages.success(request, "Record Has Been Updated!")
+            messages.success(request, "Record has been updated!")
             return redirect('home')
         return render(request, 'update_record.html', {'form': form})
     else:
-        messages.success(request, "You Must Be Logged In...")
+        messages.success(request, "You must be logged in...")
         return redirect('home')
 
 
@@ -182,28 +181,52 @@ def report(request):
     """
     Generate an Excel report with all the information from the database.
     """
-    # Fetch all records from the database
-    records = Record.objects.all().values()
+    configuration = Configuration.objects.all().values().first()
+    file_name = configuration['file_name']
+    users = configuration['users']
+    # email = configuration['email']
 
-    # Convert the records to a list of dictionaries
+    if configuration['users'] == 'all':
+        records = Record.objects.all().values()
+    else:
+        records = Record.objects.filter(user=users).values()
+
     records_list = list(records)
 
-    # Convert datetime fields to naive datetimes
     for record in records_list:
         for key, value in record.items():
-            if isinstance(value, datetime.datetime):
+            if isinstance(value, datetime):
                 record[key] = make_naive(value)
 
-    # Convert the records to a DataFrame
     df = pd.DataFrame(records_list)
 
-    # Create an Excel file in memory
     type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     response = HttpResponse(content_type=type)
-    response['Content-Disposition'] = 'attachment; filename=report.xlsx'
+    response['Content-Disposition'] = f'attachment; filename={file_name}.xlsx'
 
-    # Use pandas to write the DataFrame to the Excel file
     with pd.ExcelWriter(response, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Records')
 
     return response
+
+
+@login_required
+def configure_excel(request):
+    """
+    Configure the Excel report settings.
+    """
+    users = User.objects.filter(is_staff=False)
+    if request.method == 'POST':
+        file_name = request.POST['fileName']
+        record_type = request.POST['recordType']
+        email = request.POST['email']
+
+        configuration, created = Configuration.objects.update_or_create(
+            defaults={'file_name': file_name,
+                      'email': email,
+                      'users': record_type})
+
+        return redirect('home')
+    file_name = 'report'
+    return render(request, 'configure_excel.html', {'users': users,
+                                                    'name': file_name})
