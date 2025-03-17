@@ -67,47 +67,129 @@ class AddRecordForm(forms.ModelForm):
     """
     A form for adding new records. Includes all the required fields.
     """
-    input1 = forms.CharField(
+
+    qr = forms.CharField(
         required=True,
         widget=forms.widgets.TextInput(
-            attrs={"placeholder": "Input 1", "class": "form-control"}
+            attrs={"placeholder": "Enter QR", "class": "form-control"}
         ),
-        label=""
+        label="QR"
     )
-    input2 = forms.CharField(
-        required=True,
-        widget=forms.widgets.TextInput(
-            attrs={"placeholder": "Input 2", "class": "form-control"}
-        ),
-        label=""
-    )
-    input3 = forms.CharField(
-        required=True,
-        widget=forms.widgets.TextInput(
-            attrs={"placeholder": "Input 3", "class": "form-control"}
-        ),
-        label=""
-    )
-    input4 = forms.CharField(
-        required=True,
-        widget=forms.widgets.TextInput(
-            attrs={"placeholder": "Input 4", "class": "form-control"}
-        ),
-        label=""
-    )
-    INPUT5_CHOICES = [
-        ('Option 1', 'Option 1'),
-        ('Option 2', 'Option 2'),
-        ('Option 3', 'Option 3'),
+
+    STATION_CHOICES = [
+        ('Programing', 'Programming'),
+        ('MAC ID Association', 'MAC ID Association'),
+        ('HMI test', 'HMI test'),
+        ('Functional 1 test', 'Functional 1 test'),
+        ('Cell test', 'Cell test'),
+        ('Performance Test', 'Performance Test'),
+        ('Functional 2 test', 'Functional 2 test'),
+        ('Burn-in', 'Burn-in'),
+        ('GPS 3', 'GPS 3'),
     ]
-    input5 = forms.ChoiceField(
-        choices=INPUT5_CHOICES,
+    station = forms.ChoiceField(
+        required=True,
+        choices=STATION_CHOICES,
         widget=forms.widgets.Select(
             attrs={"class": "form-control"}
         ),
-        label=""
+        label="Select Station"
+    )
+    failure = forms.CharField(
+        required=True,
+        widget=forms.widgets.TextInput(
+            attrs={"placeholder": "Enter Failed Description",
+                   "class": "form-control"}
+        ),
+        label="Failure Description"
     )
 
     class Meta:
         model = Record
-        fields = ('input1', 'input2', 'input3', 'input4', 'input5')
+        fields = ('qr', 'station', 'failure')
+
+
+class ReportForm(forms.ModelForm):
+    COMPONENT_CHOICES = [
+        ('SOOM', 'SOOM'),
+        ('Sapphire', 'Sapphire'),
+        ('Display', 'Display'),
+        ('PIR', 'PIR'),
+        ('Voltage issue', 'Voltage issue'),
+        ('EG25', 'EG25'),
+        ('Antenna', 'Antenna'),
+        ('Buzzer', 'Buzzer'),
+        ('Other', 'Other'),
+    ]
+    component = forms.ChoiceField(
+        required=True,
+        choices=COMPONENT_CHOICES,
+        widget=forms.widgets.Select(
+            attrs={"class": "form-control"}
+        ),
+        label="Select Failed Component"
+    )
+
+    COMPONENT_STATUS_OPTION = [
+        ('Physical Damage', 'Physical Damage'),
+        ('Wrong FW', 'Wrong FW'),
+        ('Wrong HW', 'Wrong HW'),
+        ('Voltage issue', 'Voltage issue'),
+        ('Power on', 'Power on'),
+        ('MACID format', 'MACID format'),
+        ('Other', 'Other'),
+    ]
+
+    component_status = forms.ChoiceField(
+        required=True,
+        choices=COMPONENT_STATUS_OPTION,
+        widget=forms.widgets.Select(
+            attrs={"class": "form-control"}
+        ),
+        label="Component Status"
+    )
+
+    COMPONENT_REPAIRED_CHOICES = [
+        ('Repaired', 'Repaired'),
+        ('MRB', 'MRB'),
+        ('Reprogrammed', 'Reprogrammed'),
+        ('Waiting indications', 'Waiting indications'),
+        ('Scrap', 'Scrap'),
+    ]
+
+    component_repaired = forms.ChoiceField(
+        required=True,
+        choices=COMPONENT_REPAIRED_CHOICES,
+        widget=forms.widgets.Select(
+            attrs={"class": "form-control"}
+        ),
+        label="Component Repaired"
+    )
+
+    notes = forms.CharField(
+        required=True,
+        widget=forms.widgets.TextInput(
+            attrs={"placeholder": "Enter notes", "class": "form-control"}
+        ),
+        label="Notes"
+    )
+
+    SUMARY_CHOICES = [
+        ('Repaired/ sent to production', 'Repaired/ sent to production'),
+        ('On hold/ waiting materials', 'On hold/ waiting materials'),
+        ('Dissasembled/ Qr change', 'Dissasembled/ Qr change'),
+    ]
+
+    summary = forms.ChoiceField(
+        required=True,
+        choices=SUMARY_CHOICES,
+        widget=forms.widgets.Select(
+            attrs={"class": "form-control"}
+        ),
+        label="Summary"
+    )
+
+    class Meta:
+        model = Record
+        fields = ('component', 'component_status', 'component_repaired',
+                  'notes', 'summary')

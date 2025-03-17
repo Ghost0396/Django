@@ -7,11 +7,15 @@ class Record(models.Model):
     """
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.CharField(max_length=50)
-    input1 = models.CharField(max_length=50)
-    input2 = models.CharField(max_length=50)
-    input3 = models.CharField(max_length=50)
-    input4 = models.CharField(max_length=50)
-    input5 = models.CharField(max_length=50)
+    qr = models.CharField(max_length=50)
+    station = models.CharField(max_length=50)
+    failure = models.CharField(max_length=50)
+    component = models.CharField(max_length=50)
+    component_status = models.CharField(max_length=50)
+    notes = models.CharField(max_length=50)
+    component_repaired = models.CharField(max_length=50)
+    summary = models.CharField(max_length=50)
+    last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         """

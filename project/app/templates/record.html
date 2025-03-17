@@ -9,19 +9,13 @@
     </div>
     <div class="card-body">
       <p class="card-text">
-        <strong>Input1: </strong>{{ customer_record.input1 }}
+        <strong>Qr: </strong>{{ customer_record.qr }}
       </p>
       <p class="card-text">
-        <strong>Input2: </strong>{{ customer_record.input2 }}
+        <strong>Station: </strong>{{ customer_record.station }}
       </p>
       <p class="card-text">
-        <strong>Input3: </strong>{{ customer_record.input3 }}
-      </p>
-      <p class="card-text">
-        <strong>Input4: </strong>{{ customer_record.input4 }}
-      </p>
-      <p class="card-text">
-        <strong>Input5: </strong>{{ customer_record.input5 }}
+        <strong>Failure: </strong>{{ customer_record.failure }}
       </p>
     </div>
   </div>
@@ -29,7 +23,8 @@
   <br/><br/>
   <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
   <a href="{% url 'delete_record' customer_record.id %}" class="btn btn-danger">Delete</a>
-  <a href="{% url 'update_record' customer_record.id %}" class="btn btn-success">Update Record</a>
+  <a href="{% url 'update_record' customer_record.id %}" class="btn btn-primary">Update Record</a>
+  <a href="{% url 'output_record' customer_record.id %}" class="btn btn-success">Output Record</a>
 </div>
 
 {% endblock %}

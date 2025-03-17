@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddRecordForm
+from .forms import SignUpForm, AddRecordForm, ReportForm
 from .models import Record, Configuration
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
@@ -119,14 +119,37 @@ def add_record(request):
         return redirect('home')
 
 
+def output_record(request, id):
+    """
+    Handle output an existing record.
+    """
+    if request.user.is_authenticated:
+        current_record = get_object_or_404(Record, id=id)
+        if request.method == "POST":
+            form = ReportForm(request.POST, instance=current_record)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Record has been updated!")
+                return redirect('home')
+        else:
+            form = ReportForm(instance=current_record)
+        return render(request, 'report_record.html', {'form': form, 'id': id})
+    else:
+        messages.success(request, "You must be logged in...")
+        return redirect('home')
+
+
 def customer_record(request, id):
     """
     View a specific record.
     """
+    print("customer_record")
+    print(id)
     if request.user.is_authenticated:
         customer_record = get_object_or_404(Record, id=id)
         return render(request, 'record.html',
-                      {'customer_record': customer_record})
+                      {'customer_record': customer_record,
+                       'id': id})
     else:
         messages.success(request, "You must be logged in to view a record!")
         return redirect('home')
