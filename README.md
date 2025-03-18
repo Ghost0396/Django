@@ -7,7 +7,7 @@ git clone https://github.com/Ghost0396/Django.git
 ### Step 2: Navigate to the cloned directory
 After the clone process completes, you can navigate into the cloned repository's directory:
 ```bash
-cd django_example/project/
+cd DJANGO/project/
 ```
 
 ### Step 3: Install packages using `pip`
